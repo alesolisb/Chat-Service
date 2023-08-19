@@ -28,6 +28,7 @@ public class Ventana_Cliente extends JFrame {
         enviar = new JButton("Enviar", null);
 
         mensaje = new JTextField();
+
         mensaje.setPreferredSize(new Dimension(600, 40));
         mensaje.setBackground(Color.BLUE);
 
