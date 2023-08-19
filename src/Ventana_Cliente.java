@@ -29,6 +29,7 @@ public class Ventana_Cliente extends JFrame {
 
         mensaje = new JTextField();
         mensaje.setPreferredSize(new Dimension(600, 40));
+        mensaje.setBackground(Color.BLUE);
 
         chat= new JTextArea();
         chat.setBackground(Color.DARK_GRAY);
