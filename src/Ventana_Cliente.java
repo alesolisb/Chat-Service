@@ -9,7 +9,7 @@ import java.awt.Dimension;
 
 public class Ventana_Cliente extends JFrame {
     int WIDTH=1000;
-    int HEIGHT=750;
+    int HEIGHT=1000;
     JButton enviar;
     JTextField mensaje;
     JPanel panel_inferior;
@@ -28,7 +28,7 @@ public class Ventana_Cliente extends JFrame {
         enviar = new JButton("Enviar", null);
 
         mensaje = new JTextField();
-        mensaje.setPreferredSize(new Dimension(600, 40));
+        mensaje.setPreferredSize(new Dimension(600, 45));
 
         chat= new JTextArea();
         chat.setBackground(Color.DARK_GRAY);
