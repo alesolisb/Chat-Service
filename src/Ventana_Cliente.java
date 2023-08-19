@@ -9,7 +9,7 @@ import java.awt.Dimension;
 
 public class Ventana_Cliente extends JFrame {
     int WIDTH=1000;
-    int HEIGHT=1000;
+    int HEIGHT=750;
     JButton enviar;
     JTextField mensaje;
     JPanel panel_inferior;
