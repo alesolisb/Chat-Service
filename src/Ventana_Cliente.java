@@ -1,6 +1,7 @@
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -9,6 +10,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class Ventana_Cliente extends JFrame implements ActionListener{
     int WIDTH=1280;
@@ -23,6 +26,9 @@ public class Ventana_Cliente extends JFrame implements ActionListener{
     JTextField nickTextField;
     JButton nickButton;
     public String nick;
+    private String ip;
+    
+    
 
 
     Ventana_Cliente(){
@@ -31,6 +37,16 @@ public class Ventana_Cliente extends JFrame implements ActionListener{
         this.setTitle("ChatApp");
         this.setResizable(false);
         this.setSize(WIDTH, HEIGHT);
+
+        InetAddress localHost;
+        try {
+            localHost = InetAddress.getLocalHost();
+            ip = (localHost.getHostAddress()); 
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+          
 
         nickPanel = new JPanel(null);
         nickPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -52,8 +68,7 @@ public class Ventana_Cliente extends JFrame implements ActionListener{
         nickPanel.add(nickButton);
         
         this.pack();
-        this.setVisible(true);
-        
+        this.setVisible(true);    
     }
 
     @Override
@@ -63,8 +78,24 @@ public class Ventana_Cliente extends JFrame implements ActionListener{
                 ConfirmarNick();
             }
             else{
+                JOptionPane.showMessageDialog(null,"Ingresa un nombre de usuario para continuar","", JOptionPane.ERROR_MESSAGE);
                 System.out.println("Ingrese un nombre");
             }
+        }
+        if (e.getSource()==enviar){
+            if (!mensaje.getText().equals("")){
+                Envio data = new Envio();
+                data.setMensaje(mensaje.getText());
+                data.setIp(ip);
+                data.setNick(nick);
+
+
+            
+                mensaje.setText("");
+                chat.append(String.format("\n [%s - %s]: " + data.getMensaje(), data.getIp(),data.getNick()));
+                //System.out.println(String.format("\n [%s - %s]: " + data.getMensaje(), data.getIp(),data.getNick()));
+            }
+
         }
     }
 
@@ -81,7 +112,9 @@ public class Ventana_Cliente extends JFrame implements ActionListener{
         System.out.println(nickTextField.getText());
 
         nick = nickTextField.getText();
+
         enviar = new JButton("Enviar", null);
+        enviar.addActionListener(this);
 
         mensaje = new JTextField();
         mensaje.setPreferredSize(new Dimension(WIDTH/2, 40));

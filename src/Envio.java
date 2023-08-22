@@ -1,4 +1,7 @@
-public class Envio {
+//import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+public class Envio implements Serializable{
     private String ip, mensaje, nick;
 
     public String getIp(){
@@ -21,7 +24,7 @@ public class Envio {
     public void setNick(String nick){
         this.nick=nick;
     }
-    
 
+    
     
 }
