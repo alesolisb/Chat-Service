@@ -1,7 +1,7 @@
 //import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-public class Envio implements Serializable{
+public class Paquete implements Serializable{
     private String ip, mensaje, nick;
 
     public String getIp(){

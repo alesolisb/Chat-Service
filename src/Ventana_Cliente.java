@@ -10,10 +10,15 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class Ventana_Cliente extends JFrame implements ActionListener{
+public class Ventana_Cliente extends JFrame implements ActionListener, Runnable{
     int WIDTH=1280;
     int HEIGHT=720;
     JPanel nickPanel;
@@ -27,6 +32,7 @@ public class Ventana_Cliente extends JFrame implements ActionListener{
     JButton nickButton;
     public String nick;
     private String ip;
+    Socket cSocket;
     
     
 
@@ -68,7 +74,10 @@ public class Ventana_Cliente extends JFrame implements ActionListener{
         nickPanel.add(nickButton);
         
         this.pack();
-        this.setVisible(true);    
+        this.setVisible(true);
+
+        Thread hilo_cliente = new Thread(this);
+        hilo_cliente.start();
     }
 
     @Override
@@ -79,21 +88,28 @@ public class Ventana_Cliente extends JFrame implements ActionListener{
             }
             else{
                 JOptionPane.showMessageDialog(null,"Ingresa un nombre de usuario para continuar","", JOptionPane.ERROR_MESSAGE);
-                System.out.println("Ingrese un nombre");
             }
         }
         if (e.getSource()==enviar){
             if (!mensaje.getText().equals("")){
-                Envio data = new Envio();
-                data.setMensaje(mensaje.getText());
-                data.setIp(ip);
-                data.setNick(nick);
+                Paquete datos_s = new Paquete();
+                try {
+                    cSocket = new Socket(ip,9999);
+                    datos_s.setMensaje(mensaje.getText());
+                    datos_s.setIp(ip);
+                    datos_s.setNick(nick);
+                    ObjectOutputStream datos_salida = new ObjectOutputStream(cSocket.getOutputStream());
+                    datos_salida.writeObject(datos_s);
+                    cSocket.close();
+                    
+                } catch (UnknownHostException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
 
-
-            
                 mensaje.setText("");
-                chat.append(String.format("\n [%s - %s]: " + data.getMensaje(), data.getIp(),data.getNick()));
-                //System.out.println(String.format("\n [%s - %s]: " + data.getMensaje(), data.getIp(),data.getNick()));
+                chat.append(String.format("\n [%s - %s]: " + datos_s.getMensaje(), datos_s.getIp(),datos_s.getNick()));
             }
 
         }
@@ -139,5 +155,28 @@ public class Ventana_Cliente extends JFrame implements ActionListener{
         panelInferior.add(mensaje);
         panelInferior.add(enviar); 
 
+    }
+
+    @Override
+    public void run() {
+        try {
+            ServerSocket cServerSocket = new ServerSocket(9090);
+            Socket c;
+            Paquete datos_e = new Paquete();
+            
+            while (true){
+                c=cServerSocket.accept();
+                ObjectInputStream datos_entrada = new ObjectInputStream(c.getInputStream());
+                datos_e= (Paquete) datos_entrada.readObject();
+                chat.append(String.format("\n [%s - %s]: " + datos_e.getMensaje(), datos_e.getIp(),datos_e.getNick()));
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
     }
 }
