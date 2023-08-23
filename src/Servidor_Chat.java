@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -20,12 +21,16 @@ public class Servidor_Chat implements Runnable{
 
             System.out.println(String.format("\n SERVER: [%s - %s]: " + datos_e.getMensaje(), datos_e.getIp(),datos_e.getNick()));
 
+            Socket reenviar = new Socket(datos_e.getIp(), 9090);
+
+            ObjectOutputStream datos_salida = new ObjectOutputStream(reenviar.getOutputStream());
+
+            datos_salida.writeObject(datos_e);
+            reenviar.close();
             s.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

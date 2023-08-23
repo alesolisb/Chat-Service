@@ -162,7 +162,7 @@ public class Ventana_Cliente extends JFrame implements ActionListener, Runnable{
         try {
             ServerSocket cServerSocket = new ServerSocket(9090);
             Socket c;
-            Paquete datos_e = new Paquete();
+            Paquete datos_e;
             
             while (true){
                 c=cServerSocket.accept();
