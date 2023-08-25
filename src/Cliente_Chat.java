@@ -39,11 +39,6 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
     int port;
     int destport;
     Socket cSocket;
-
-
-    public static void main(String[] args){
-        new Cliente_Chat();
-    }
     Cliente_Chat(){
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -5,10 +5,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Servidor_Chat implements Runnable{
-    public static void main(String[] args){
-        new Servidor_Chat();
-    }
-
     Servidor_Chat(){
         Thread hilo_servidor = new Thread(this);
         hilo_servidor.start();
