@@ -1,7 +1,7 @@
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+//import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
+//import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -28,16 +28,22 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
     JPanel panelInferior;
     JTextArea chat;
     JLabel nickLabel;
+    JLabel portLabel;
+    JLabel destLabel;
     JTextField nickTextField;
+    JTextField portTextField;
+    JTextField destTextField;
     JButton nickButton;
     public String nick;
     private String ip;
+    int port;
+    int destport;
     Socket cSocket;
+
 
     public static void main(String[] args){
         new Cliente_Chat();
     }
-    
     Cliente_Chat(){
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -45,35 +51,41 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
         this.setResizable(false);
         this.setSize(WIDTH, HEIGHT);
 
-        InetAddress localHost;
+        /*InetAddress localHost;
         try {
             localHost = InetAddress.getLocalHost();
             ip = (localHost.getHostAddress()); 
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
-        }
-          
+        }*/
 
         nickPanel = new JPanel(null);
         nickPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-
         
         nickLabel= new JLabel("¿Cuál es tu nombre?");
-        nickLabel.setBounds((WIDTH/2)-100, (HEIGHT/2) - 100, 200, 30);
-
-        nickButton = new JButton("Confirmar");
-        nickButton.setBounds((WIDTH/2)+100, (HEIGHT/2), 100, 30);
-        nickButton.addActionListener(this);
+        nickLabel.setBounds((WIDTH/2)-60, (HEIGHT/2) - 100, 120, 30);
 
         nickTextField = new JTextField();
-        nickTextField.setBounds((WIDTH/2)-200, (HEIGHT/2), 300, 30);
+        nickTextField.setBounds((WIDTH/2)-150, (HEIGHT/2)-50, 300, 30);
+
+        //portLabel= new JLabel("Ingresa un numero de puerto entre 0 y 60");
+        //portLabel.setBounds((WIDTH/2)-120, (HEIGHT/2), 240, 30);
+
+        //portTextField = new JTextField();
+        //portTextField.setBounds((WIDTH/2)-150, (HEIGHT/2) + 50, 300, 30);
+
+
+        nickButton = new JButton("Confirmar");
+        nickButton.setBounds((WIDTH/2)-50, (HEIGHT/2)+100, 100, 30);
+        nickButton.addActionListener(this);
 
         this.add(nickPanel);
         nickPanel.add(nickLabel);
         nickPanel.add(nickTextField);
         nickPanel.add(nickButton);
-        
+        //nickPanel.add(portLabel);
+        //nickPanel.add(portTextField);
+
         this.pack();
         this.setVisible(true);
 
@@ -86,19 +98,31 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
         if (e.getSource()==nickButton){
             if (!nickTextField.getText().equals("")){
                 ConfirmarNick();
+
+                    /*port = Integer.parseInt(portTextField.getText());
+                    if ((0<= port) && (port<=60)){
+                        
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(null,"El número de puerto debe estar entre 0 y 60","", JOptionPane.ERROR_MESSAGE);
+                    }*/
+
+                }
             }
-            else{
-                JOptionPane.showMessageDialog(null,"Ingresa un nombre de usuario para continuar","", JOptionPane.ERROR_MESSAGE);
-            }
+        else{
+            //JOptionPane.showMessageDialog(null,"Ingresa un nombre de usuario para continuar","ERROR", JOptionPane.ERROR_MESSAGE);
         }
         if (e.getSource()==enviar){
             if (!mensaje.getText().equals("")){
                 Paquete datos_s = new Paquete();
                 try {
-                    cSocket = new Socket("127.0.0.1",9999);
+                    cSocket = new Socket(ip,9999);
                     datos_s.setMensaje(mensaje.getText());
-                    datos_s.setIp(ip);
+                    datos_s.setIp(destTextField.getText());
                     datos_s.setNick(nick);
+                    //destport = (int) Integer.parseInt(destTextField.getText().trim());
+                    //System.out.println(destport);
+                    //datos_s.setPort(destport);                
                     ObjectOutputStream datos_salida = new ObjectOutputStream(cSocket.getOutputStream());
                     datos_salida.writeObject(datos_s);
                     cSocket.close();
@@ -108,16 +132,13 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-
                 mensaje.setText("");
-                chat.append(String.format("\n"+ datos_s.getMensaje()));
+                chat.append("\n"+ datos_s.getMensaje());
             }
-
         }
     }
 
     public void ConfirmarNick(){
-        
 
         chatPanel= new JPanel(new BorderLayout());
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -125,20 +146,24 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
         this.getContentPane().add(chatPanel);
         this.revalidate();
         this.pack();
-    
-        System.out.println(nickTextField.getText());
 
         nick = nickTextField.getText();
-
-        enviar = new JButton("Enviar", null);
+        //port = Integer.parseInt(portTextField.getText().trim());
+        
+        enviar = new JButton("Enviar");
         enviar.addActionListener(this);
 
         mensaje = new JTextField();
         mensaje.setPreferredSize(new Dimension(WIDTH/2, 40));
 
-        nickLabel = new JLabel(nick);
+        nickLabel = new JLabel(nick+": "+String.valueOf(port));
         nickLabel.setPreferredSize(new Dimension(100, 40));
 
+        destLabel = new JLabel("IP del destinatario: ");
+        destLabel.setPreferredSize(new Dimension(135, 40));
+
+        destTextField = new JTextField();
+        destTextField.setPreferredSize(new Dimension(100, 40));
 
         chat= new JTextArea();
         chat.setBackground(Color.DARK_GRAY);
@@ -154,10 +179,12 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
         
         panelInferior.add(nickLabel);
         panelInferior.add(mensaje);
-        panelInferior.add(enviar); 
+        panelInferior.add(enviar);
+        panelInferior.add(destLabel);
+        panelInferior.add(destTextField);
+
 
     }
-
     @Override
     public void run() {
         try {
@@ -166,18 +193,18 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
             Paquete datos_e;
             
             while (true){
+
                 c=cServerSocket.accept();
                 ObjectInputStream datos_entrada = new ObjectInputStream(c.getInputStream());
                 datos_e= (Paquete) datos_entrada.readObject();
                 chat.append(String.format("\n [%s - %s]: " + datos_e.getMensaje(), datos_e.getIp(),datos_e.getNick()));
+                c.close();
+                datos_entrada.close();
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
-        }
-        
+        } 
     }
 }

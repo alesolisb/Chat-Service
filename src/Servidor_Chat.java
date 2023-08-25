@@ -25,8 +25,10 @@ public class Servidor_Chat implements Runnable{
                 datos_entrada = new ObjectInputStream(s.getInputStream());
                 datos_e = (Paquete) datos_entrada.readObject();
 
-                System.out.println(String.format("\n SERVER: [%s - %s]: " + datos_e.getMensaje(), datos_e.getIp(),datos_e.getNick()));
+                //System.out.println(String.format("\n SERVER: [%s - %s]: " + datos_e.getMensaje(), datos_e.getIp(),datos_e.getNick()));
 
+                //Socket reenviar = new Socket("127.0.0.1", datos_e.getPort());
+                //System.out.println(datos_e.getPort());
                 Socket reenviar = new Socket(datos_e.getIp(), 9090);
 
                 ObjectOutputStream datos_salida = new ObjectOutputStream(reenviar.getOutputStream());
