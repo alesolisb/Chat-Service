@@ -3,13 +3,20 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+/**
+ * Esta clase crea un servidor para el servicvio de chat
+ * @author Sergio Salazar
+ * @version 25/08/2023
+ */
 public class Servidor_Chat implements Runnable{
     Servidor_Chat(){
         Thread hilo_servidor = new Thread(this);
         hilo_servidor.start();
     }
-    @Override
+    /**
+     * Perimte que el servidor esté siempre a la escucha de nuevos mensajes y los reenvia inmediatamente
+     * @author Sergio Salazar
+     * */@Override
     public void run() {
         try {
             ServerSocket sServerSocket= new ServerSocket(9999);
@@ -21,10 +28,6 @@ public class Servidor_Chat implements Runnable{
                 datos_entrada = new ObjectInputStream(s.getInputStream());
                 datos_e = (Paquete) datos_entrada.readObject();
 
-                //System.out.println(String.format("\n SERVER: [%s - %s]: " + datos_e.getMensaje(), datos_e.getIp(),datos_e.getNick()));
-
-                //Socket reenviar = new Socket("127.0.0.1", datos_e.getPort());
-                //System.out.println(datos_e.getPort());
                 Socket reenviar = new Socket(datos_e.getIp(), 9090);
 
                 ObjectOutputStream datos_salida = new ObjectOutputStream(reenviar.getOutputStream());
@@ -39,7 +42,5 @@ public class Servidor_Chat implements Runnable{
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
-    }
-    
+    } 
 }

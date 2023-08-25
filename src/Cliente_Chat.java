@@ -1,7 +1,6 @@
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-//import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -17,9 +16,13 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
+/**
+ * Esta clase construye una ventana para un cliente de la aplicación de chat
+ * @author Alejandro Solís
+ * 
+ */
 public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
-    int WIDTH=1280;
+    int WIDTH=900;
     int HEIGHT=720;
     JPanel nickPanel;
     JPanel chatPanel;
@@ -35,10 +38,13 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
     JTextField destTextField;
     JButton nickButton;
     public String nick;
-    private String ip;
+    //private String ip;
     int port;
     int destport;
     Socket cSocket;
+    /**
+     * Constructor inicial para la ventana, GUI que guarda el nombre del usuario
+     */
     Cliente_Chat(){
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -63,13 +69,6 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
         nickTextField = new JTextField();
         nickTextField.setBounds((WIDTH/2)-150, (HEIGHT/2)-50, 300, 30);
 
-        //portLabel= new JLabel("Ingresa un numero de puerto entre 0 y 60");
-        //portLabel.setBounds((WIDTH/2)-120, (HEIGHT/2), 240, 30);
-
-        //portTextField = new JTextField();
-        //portTextField.setBounds((WIDTH/2)-150, (HEIGHT/2) + 50, 300, 30);
-
-
         nickButton = new JButton("Confirmar");
         nickButton.setBounds((WIDTH/2)-50, (HEIGHT/2)+100, 100, 30);
         nickButton.addActionListener(this);
@@ -78,8 +77,6 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
         nickPanel.add(nickLabel);
         nickPanel.add(nickTextField);
         nickPanel.add(nickButton);
-        //nickPanel.add(portLabel);
-        //nickPanel.add(portTextField);
 
         this.pack();
         this.setVisible(true);
@@ -87,37 +84,23 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
         Thread hilo_cliente = new Thread(this);
         hilo_cliente.start();
     }
-
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource()==nickButton){
             if (!nickTextField.getText().equals("")){
                 ConfirmarNick();
-
-                    /*port = Integer.parseInt(portTextField.getText());
-                    if ((0<= port) && (port<=60)){
-                        
-                    }
-                    else{
-                        JOptionPane.showMessageDialog(null,"El número de puerto debe estar entre 0 y 60","", JOptionPane.ERROR_MESSAGE);
-                    }*/
-
-                }
             }
-        else{
-            //JOptionPane.showMessageDialog(null,"Ingresa un nombre de usuario para continuar","ERROR", JOptionPane.ERROR_MESSAGE);
         }
+
         if (e.getSource()==enviar){
             if (!mensaje.getText().equals("")){
                 Paquete datos_s = new Paquete();
                 try {
-                    cSocket = new Socket(ip,9999);
+                    cSocket = new Socket("192.168.1.72",9999);
                     datos_s.setMensaje(mensaje.getText());
                     datos_s.setIp(destTextField.getText());
-                    datos_s.setNick(nick);
-                    //destport = (int) Integer.parseInt(destTextField.getText().trim());
-                    //System.out.println(destport);
-                    //datos_s.setPort(destport);                
+                    datos_s.setNick(nick);             
                     ObjectOutputStream datos_salida = new ObjectOutputStream(cSocket.getOutputStream());
                     datos_salida.writeObject(datos_s);
                     cSocket.close();
@@ -132,7 +115,10 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
             }
         }
     }
-
+    /**
+     * Al confirmar el nombre de usuario despliega la interfaz de chat
+     * @author Alejandro Solís
+     */
     public void ConfirmarNick(){
 
         chatPanel= new JPanel(new BorderLayout());
@@ -143,8 +129,7 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
         this.pack();
 
         nick = nickTextField.getText();
-        //port = Integer.parseInt(portTextField.getText().trim());
-        
+
         enviar = new JButton("Enviar");
         enviar.addActionListener(this);
 
@@ -178,9 +163,12 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
         panelInferior.add(destLabel);
         panelInferior.add(destTextField);
 
-
     }
     @Override
+    /**
+     * Crea el socket server para que el cliente esté siempre a la escucha de nuevos mensarjes que provienen del servidor y los despliega en el chat
+     * @author Sergio Salazar
+     * */
     public void run() {
         try {
             ServerSocket cServerSocket = new ServerSocket(9090);
@@ -192,7 +180,7 @@ public class Cliente_Chat extends JFrame implements ActionListener, Runnable{
                 c=cServerSocket.accept();
                 ObjectInputStream datos_entrada = new ObjectInputStream(c.getInputStream());
                 datos_e= (Paquete) datos_entrada.readObject();
-                chat.append(String.format("\n [%s - %s]: " + datos_e.getMensaje(), datos_e.getIp(),datos_e.getNick()));
+                chat.append(String.format("\n\t [%s]: " + datos_e.getMensaje()+"\n",datos_e.getNick()));
                 c.close();
                 datos_entrada.close();
             }
